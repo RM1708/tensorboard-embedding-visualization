@@ -9,7 +9,14 @@ import numpy as np
 import tensorflow as tf
 
 
-def summary_embedding(sess, dataset, embedding_list, embedding_path, image_size, channel=3, labels=None):
+def summary_embedding(sess, 
+                      dataset, \
+                      embedding_list, \
+                      embedding_path, \
+                      image_size, \
+                      channel=3, \
+                      labels=None):
+    
     if not os.path.exists(embedding_path):
         os.makedirs(embedding_path)
 
@@ -21,15 +28,26 @@ def summary_embedding(sess, dataset, embedding_list, embedding_path, image_size,
     config = projector.ProjectorConfig()
 
     for embed_idx, embed_vectors in enumerate(embedding_list):
-        embed_tensor = make_embed_tensor(sess, embed_vectors, embed_idx)
-        write_projector_config(config, embed_tensor.name, embedding_path, image_size, channel, summary_writer, labels)
+        embed_tensor = make_embed_tensor(sess, \
+                                         embed_vectors, \
+                                         embed_idx)
+        write_projector_config(config, \
+                               embed_tensor.name, \
+                               embedding_path, \
+                               image_size, \
+                               channel, \
+                               summary_writer, \
+                               labels)
 
     summary_writer.close()
 
     save_model(sess, embedding_path)
 
     # Make sprite and labels.
-    make_sprite(dataset, image_size, channel, embedding_path)
+    make_sprite(dataset, \
+                image_size, \
+                channel, \
+                embedding_path)
     if labels is not None and len(labels) > 0:
         make_metadata(labels, embedding_path)
 
@@ -83,17 +101,27 @@ def make_metadata(labels, output_path):
 
 
 def make_embed_tensor(sess, embed_vectors, embed_idx):
+    assert(2 == len(embed_vectors.shape))
     if len(embed_vectors.shape) != 2:
-        embed_tensor = tf.Variable(np.array(embed_vectors).reshape(len(embed_vectors), -1),
+        embed_vectors_reshaped = \
+                np.array(embed_vectors).reshape(len(embed_vectors), -1)
+        embed_tensor = tf.Variable(embed_vectors_reshaped,
                                    name=('embed_%s' % embed_idx))
     else:
-        embed_tensor = tf.Variable(embed_vectors, name=('embed_%s' % embed_idx))
+        embed_tensor = tf.Variable(embed_vectors, \
+                                   name=('embed_%s' % embed_idx))
 
     sess.run(embed_tensor.initializer)
     return embed_tensor
 
 
-def write_projector_config(config, tensor_name, output_path, image_size, channel, summary_writer, labels):
+def write_projector_config(config, \
+                           tensor_name, \
+                           output_path, \
+                           image_size, \
+                           channel, \
+                           summary_writer, \
+                           labels):
     embedding = config.embeddings.add()
     embedding.tensor_name = tensor_name
     if labels is not None and len(labels) > 0:
