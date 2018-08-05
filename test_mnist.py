@@ -153,6 +153,7 @@ import write_projector_data
 #embedder.summary_embedding(sess=sess, \
 write_projector_data.write_projector_data(sess=sess, \
                            dataset=batch_dataset, \
+#                           dataset is used for making the sprites
                            projector_data_list=[activations], 
 #                           embedding_list=[activations], 
                            #embedding_list is list of 1 item.
