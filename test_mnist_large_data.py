@@ -45,6 +45,7 @@ def model():
 input_placeholder, logits = model()
 
 # 2. load dataset to visualize embedding
+print("\nLoading Data Sets ...")
 data_sets = input_data.read_data_sets(test_path, validation_size=BATCH_SIZE)
 
 # 3. init session
@@ -52,6 +53,7 @@ sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
 # 4. load pre-trained model file
+print("\nLoading pre-trained model ...")
 saver = tf.train.Saver()
 saver.restore(sess, os.path.join(test_path, 'model.ckpt'))
 
@@ -61,7 +63,8 @@ total_labels = None
 total_activations = None
 for i in range(10):
     batch_dataset, batch_labels = data_sets.validation.next_batch(BATCH_SIZE)
-    feed_dict = {input_placeholder: batch_dataset.reshape([BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, NUM_CHANNELS])}
+    feed_dict = {input_placeholder: batch_dataset.reshape([BATCH_SIZE, IMAGE_SIZE, \
+                                                           IMAGE_SIZE, NUM_CHANNELS])}
     activations = sess.run(logits, feed_dict)
 
     if total_dataset is None:
@@ -73,6 +76,13 @@ for i in range(10):
         total_labels = np.append(batch_labels, total_labels, axis=0)
         total_activations = np.append(activations, total_activations, axis=0)
 
-embedder.summary_embedding(sess=sess, dataset=total_dataset, embedding_list=[total_activations],
-                           embedding_path=os.path.join(test_path, 'embedding'), image_size=IMAGE_SIZE,
-                           channel=NUM_CHANNELS, labels=total_labels)
+print("\nPutting the data into file for visualizing ...")
+embedder.summary_embedding(sess=sess, \
+                           dataset=total_dataset, \
+                           embedding_list=[total_activations],
+                           embedding_path=os.path.join(test_path, 'embedding'), \
+                           image_size=IMAGE_SIZE,
+                           channel=NUM_CHANNELS, \
+                           labels=total_labels)
+
+print("\n\tDONE: ", __file__)
